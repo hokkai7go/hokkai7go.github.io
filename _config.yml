@@ -1,0 +1,16 @@
+# Site settings
+title: Actually, my screen name is hokkai7go
+email: hokkai7go@gmail.com
+description: > # this means to ignore newlines until "baseurl:"
+  For my self-introduction page
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "http://hokkai7go.github.io" # the base hostname & protocol for your site
+twitter_username: hokkai7go
+github_username:  hokkai7go
+
+# Build settings
+auto: true
+server: true
+markdown: kramdown
+gems:
+  - jekyll-last-modified-at
