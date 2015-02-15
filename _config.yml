@@ -12,5 +12,3 @@ github_username:  hokkai7go
 auto: true
 server: true
 markdown: kramdown
-gems:
-  - jekyll-last-modified-at

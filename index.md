@@ -2,9 +2,7 @@
 layout: posts
 ---
 
-## Activity list
-
-Last Update: {% last_modified_at %B %d, %Y %}
+# Activity list
 
 ## コミュニティでの記事 / Community articles
 
