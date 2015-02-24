@@ -2,6 +2,12 @@
 layout: posts
 ---
 
+# Profile
+
+- GitHub: hokkai7go
+- Twitter: @hokkai7go
+- Facebook: https://www.facebook.com/yutaro.sugai
+
 # Activity list
 
 ## コミュニティでの記事 / Community articles
@@ -27,6 +33,8 @@ layout: posts
 1. [Chef実践入門 ~コードによるインフラ構成の自動化 (WEB+DB PRESS plus)](https://gihyo.jp/book/2014/978-4-7741-6500-4)
 
 ## プレゼンテーション / Oral presentations
+
+1. [Chef・Ansible等を用いた環境の自動構築方法](https://speakerdeck.com/hokkai7go/jopf-seminar-chef-and-ansible), 日本OSS推進フォーラム主催 第5回アプリケーション部会勉強会, Tokyo, Japan(2015.2)
 
 1. [Zero to Oneが何を教えてくれたか(ShibuyaRubyKaigi01 explanation of Zero to One)](https://speakerdeck.com/hokkai7go/shibuyarubykaigi01-explanation-of-zero-to-one), ShibuyaRubyKaigi01, Tokyo, Japan(2014.11)
 
