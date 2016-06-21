@@ -34,6 +34,8 @@ layout: posts
 
 ## プレゼンテーション / Oral presentations
 
+1. [運用観点から見たSoftLayerの魅力について(Charm of SoftLayer)](https://speakerdeck.com/hokkai7go/charm-of-softlayer), 札幌IBMクラウド勉強会, Sapporo, Japan(2016.17)
+
 1. [Chef・Ansible等を用いた環境の自動構築方法](https://speakerdeck.com/hokkai7go/jopf-seminar-chef-and-ansible), 日本OSS推進フォーラム主催 第5回アプリケーション部会勉強会, Tokyo, Japan(2015.2)
 
 1. [Zero to Oneが何を教えてくれたか(ShibuyaRubyKaigi01 explanation of Zero to One)](https://speakerdeck.com/hokkai7go/shibuyarubykaigi01-explanation-of-zero-to-one), ShibuyaRubyKaigi01, Tokyo, Japan(2014.11)
