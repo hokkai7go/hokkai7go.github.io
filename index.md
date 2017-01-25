@@ -34,6 +34,8 @@ layout: posts
 
 ## プレゼンテーション / Oral presentations
 
+1. [AWSとサーバーレスと監視](https://speakerdeck.com/hokkai7go/aws-and-serverless-and-monitoring), Yahoo! JAPAN MeetUp #8 （インフラ技術カンファレンス）, Tokyo, Japan(2017.1)
+
 1. [運用観点から見たSoftLayerの魅力について(Charm of SoftLayer)](https://speakerdeck.com/hokkai7go/charm-of-softlayer), 札幌IBMクラウド勉強会, Sapporo, Japan(2016.6)
 
 1. [Chef・Ansible等を用いた環境の自動構築方法](https://speakerdeck.com/hokkai7go/jopf-seminar-chef-and-ansible), 日本OSS推進フォーラム主催 第5回アプリケーション部会勉強会, Tokyo, Japan(2015.2)
