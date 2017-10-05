@@ -34,6 +34,8 @@ layout: posts
 
 ## プレゼンテーション / Oral presentations
 
+1. [サーバーレスと手を抜かない権限管理](https://speakerdeck.com/hokkai7go/serverless-and-tough-access-management), Serverless Meetup Tokyo #5, Tokyo, Japan(2017.9)
+
 1. [AWSとサーバーレスと監視](https://speakerdeck.com/hokkai7go/aws-and-serverless-and-monitoring), Yahoo! JAPAN MeetUp #8 （インフラ技術カンファレンス）, Tokyo, Japan(2017.1)
 
 1. [運用観点から見たSoftLayerの魅力について(Charm of SoftLayer)](https://speakerdeck.com/hokkai7go/charm-of-softlayer), 札幌IBMクラウド勉強会, Sapporo, Japan(2016.6)
