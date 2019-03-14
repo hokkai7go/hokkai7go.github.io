@@ -34,6 +34,8 @@ layout: posts
 
 ## プレゼンテーション / Oral presentations
 
+1. [割れ窓理論をWebインフラの改善に活用し、チーム内の知識共有を促進している話](https://speakerdeck.com/hokkai7go/sre-lounge8), SRE Lounge #8, Tokyo, Japan(2019.3)
+
 1. [Eightがサーバーサイド/インフラのメンテナンス性向上のために実現してきたこと](https://speakerdeck.com/hokkai7go/what-has-been-realized-to-improve-maintainability-at-eight), GMOペパボ × Sansan合同勉強会 「歴史ある大規模サービスがまだなお成長する秘訣」, Fukuoka, Japan(2017.11)
 
 1. [サーバーレスと手を抜かない権限管理](https://speakerdeck.com/hokkai7go/serverless-and-tough-access-management), Serverless Meetup Tokyo #5, Tokyo, Japan(2017.9)
