@@ -34,6 +34,8 @@ layout: posts
 
 ## プレゼンテーション / Oral presentations
 
+1. [SREチームにおけるスクラムの実践](https://speakerdeck.com/hokkai7go/devlove-kansai-sre-scrum), DevLOVE関西 FearlessChange実践編, Osaka, Japan(2019.10)
+
 1. [割れ窓理論をWebインフラの改善に活用し、チーム内の知識共有を促進している話](https://speakerdeck.com/hokkai7go/sre-lounge8), SRE Lounge #8, Tokyo, Japan(2019.3)
 
 1. [Eightがサーバーサイド/インフラのメンテナンス性向上のために実現してきたこと](https://speakerdeck.com/hokkai7go/what-has-been-realized-to-improve-maintainability-at-eight), GMOペパボ × Sansan合同勉強会 「歴史ある大規模サービスがまだなお成長する秘訣」, Fukuoka, Japan(2017.11)
