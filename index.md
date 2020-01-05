@@ -10,29 +10,13 @@ layout: posts
 
 # Activity list
 
-## コミュニティでの記事 / Community articles
-
-1. [RubyConf 2013 参加レポート](http://magazine.rubyist.net/?0045-RubyConf2013)
-
-1. [RegionalRubyKaigi レポート (37) 大江戸 Ruby 会議 03](http://magazine.rubyist.net/?0042-OoedoRubyKaigi03Report)
-
-1. [RegionalRubyKaigi レポート (33) 東京 Ruby 会議 10](http://magazine.rubyist.net/?0041-TokyoRubyKaigi10Report_1st)
-
-1. [Sapporo RubyKaigi 2012 スペシャルレポート](http://gihyo.jp/news/report/01/sapporo-rubykaigi2012)
-
-1. [RegionalRubyKaigi レポート (29) みなと Ruby 会議 01](http://magazine.rubyist.net/?0039-MinatoRubyKaigi01Report)
-
-1. [日本 Ruby 会議 2011 直前特集号](http://magazine.rubyist.net/?preRubyKaigi2011)
-
-1. [RegionalRubyKaigi レポート (23) 大江戸 Ruby 会議 01](http://magazine.rubyist.net/?0034-OoedoRubyKaigi01Report)
-
-1. [RegionalRubyKaigi レポート (17) 札幌 Ruby 会議 03](http://magazine.rubyist.net/?0033-SapporoRubyKaigi03Report)
-
 ## 著書 / Books
 
 1. [Chef実践入門 ~コードによるインフラ構成の自動化 (WEB+DB PRESS plus)](https://gihyo.jp/book/2014/978-4-7741-6500-4)
 
 ## プレゼンテーション / Oral presentations
+
+1. [はてなSREチームにおけるスクラムの実践](http://slides.hokkai7go.jp/jtf2019-hatena-sre-scrum.pdf), July Tech Festa2019, Tokyo, Japan(2019.12)
 
 1. [SREチームにおけるスクラムの実践](https://speakerdeck.com/hokkai7go/devlove-kansai-sre-scrum), DevLOVE関西 FearlessChange実践編, Osaka, Japan(2019.10)
 
@@ -61,3 +45,22 @@ layout: posts
 1. [Cookbook 作りでハマったところ(trouble in making Cookbook)](http://www.slideshare.net/hokkai7go/engine-yard-chef), Engine Yard chef meetup, Tokyo, Japan(2013.02)
 
 1. [万葉に入社しました(I joined Everyleaf corporation)](http://www.slideshare.net/hokkai7go/reject-tokyorubykaigi-10), Reject TokyoRubyKaigi 10, Tokyo, Japan(2012.8)
+
+## コミュニティでの記事 / Community articles
+
+1. [RubyConf 2013 参加レポート](http://magazine.rubyist.net/?0045-RubyConf2013)
+
+1. [RegionalRubyKaigi レポート (37) 大江戸 Ruby 会議 03](http://magazine.rubyist.net/?0042-OoedoRubyKaigi03Report)
+
+1. [RegionalRubyKaigi レポート (33) 東京 Ruby 会議 10](http://magazine.rubyist.net/?0041-TokyoRubyKaigi10Report_1st)
+
+1. [Sapporo RubyKaigi 2012 スペシャルレポート](http://gihyo.jp/news/report/01/sapporo-rubykaigi2012)
+
+1. [RegionalRubyKaigi レポート (29) みなと Ruby 会議 01](http://magazine.rubyist.net/?0039-MinatoRubyKaigi01Report)
+
+1. [日本 Ruby 会議 2011 直前特集号](http://magazine.rubyist.net/?preRubyKaigi2011)
+
+1. [RegionalRubyKaigi レポート (23) 大江戸 Ruby 会議 01](http://magazine.rubyist.net/?0034-OoedoRubyKaigi01Report)
+
+1. [RegionalRubyKaigi レポート (17) 札幌 Ruby 会議 03](http://magazine.rubyist.net/?0033-SapporoRubyKaigi03Report)
+
