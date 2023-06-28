@@ -16,6 +16,10 @@ layout: posts
 
 ## プレゼンテーション / Oral presentations
 
+1. [情シスを影で支えるコードたち](https://esa-pages.io/p/sharing/4474/posts/187/3efa75f5659cd3760ad0.html), Corporate Engineer Infosys Kansai meetup, Osaka, Japan(2023.6)
+
+1. [情シスを影で支えるRuby](https://gotanda-rb.connpass.com/event/279674/), Gotanda.rb#52, Online(2023.3)
+
 1. [はてなSREチームにおけるスクラムの実践](http://slides.hokkai7go.jp/jtf2019-hatena-sre-scrum.pdf), July Tech Festa2019, Tokyo, Japan(2019.12)
 
 1. [SREチームにおけるスクラムの実践](https://speakerdeck.com/hokkai7go/devlove-kansai-sre-scrum), DevLOVE関西 FearlessChange実践編, Osaka, Japan(2019.10)
