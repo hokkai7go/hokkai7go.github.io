@@ -16,6 +16,10 @@ layout: posts
 
 ## プレゼンテーション / Oral presentations
 
+1. 野良BoF"【若者向け】みんな学生時代何してた？若手エンジニアの成長戦略について議論するBoF"(資料なし), JANOG55, Kyoto, Japan(2025.1)
+
+1. 情シスSlack 関西交流会vol.3 LT 医療情シス支援はじめました(資料非公開), 情シスSlack 関西交流会vol.3, Osaka, Japan(2025.1)
+
 1. [情シスを影で支えるコードたち](https://esa-pages.io/p/sharing/4474/posts/187/3efa75f5659cd3760ad0.html), Corporate Engineer Infosys Kansai meetup, Osaka, Japan(2023.6)
 
 1. [情シスを影で支えるRuby](https://gotanda-rb.connpass.com/event/279674/), Gotanda.rb#52, Online(2023.3)
