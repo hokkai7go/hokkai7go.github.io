@@ -16,6 +16,8 @@ layout: posts
 
 ## プレゼンテーション / Oral presentations
 
+1. [共通言語と現場への共感で歩む：医療の「安全」と「DX」を繋ぐための越境の実践](https://speakerdeck.com/hokkai7go/devopsdays2026-tokyo-cross-border-practices-to-connect-safety-and-dx-in-healthcare), DevOpsDays Tokyo 2026, Tokyo, Japan(2026.4)
+
 1. 野良BoF"【若者向け】みんな学生時代何してた？若手エンジニアの成長戦略について議論するBoF"(資料なし), JANOG55, Kyoto, Japan(2025.1)
 
 1. 情シスSlack 関西交流会vol.3 LT 医療情シス支援はじめました(資料非公開), 情シスSlack 関西交流会vol.3, Osaka, Japan(2025.1)
