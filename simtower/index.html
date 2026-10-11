@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>摩天楼と地下鉄</title>
+<script>
+/* Google Analytics 4 の測定ID。G-XXXXXXXXXX のままなら何も送信しない */
+window.GA_ID='G-MD9B0HMBFD';
+window.track=function(){};
+if(!/X{10}$/.test(window.GA_ID)){
+  var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+window.GA_ID;document.head.appendChild(s);
+  window.dataLayer=window.dataLayer||[];
+  window.gtag=function(){dataLayer.push(arguments)};
+  gtag('js',new Date());gtag('config',window.GA_ID);
+  window.track=function(name,params){gtag('event',name,params||{})};
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* レイアウト: 上に時計と3つの数字、下にビル経営と市長の2画面。広い画面では左右に並べ、狭い画面ではタブで切り替える */
+:root{
+  --bg:#E9EDF1; --panel:#FFFFFF; --ink:#18202B; --muted:#5A6675; --rule:#CBD3DC; --tile:#DEE5EC;
+  --accent:#D45E27; --accent-ink:#FFFFFF;
+  --l1:#2766AE; --l2:#2B9466; --l3:#8A4CC2; --l4:#C23E78;
+  --building:#2B3542; --win-off:#3B4757; --win-on:#F3BE45; --shop-on:#F08A4B;
+  --good:#2C8A57; --warn:#B9800F; --bad:#BC3A2E;
+  --sky:#CFDCE8; --brick:#7A4330; --home:#3D5C4C; --home-on:#FFE3A6;
+  --f-display:"DotGothic16","Hiragino Kaku Gothic ProN",monospace;
+  --f-body:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10151C; --panel:#18202A; --ink:#E3E8EE; --muted:#95A2B1; --rule:#2B3644; --tile:#1F2833;
+  --accent:#EB7A43; --accent-ink:#1A0F08;
+  --l1:#5C9BE2; --l2:#45BE88; --l3:#B184E6; --l4:#E56FA3;
+  --building:#2E3948; --win-off:#222B36; --win-on:#F5C858; --shop-on:#F49A62;
+  --good:#4CC183; --warn:#E3AE3C; --bad:#EE6A5C; --sky:#1A2533; --brick:#5E3324; --home:#2E4A3C; --home-on:#FFDD95;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10151C; --panel:#18202A; --ink:#E3E8EE; --muted:#95A2B1; --rule:#2B3644; --tile:#1F2833;
+  --accent:#EB7A43; --accent-ink:#1A0F08;
+  --l1:#5C9BE2; --l2:#45BE88; --l3:#B184E6; --l4:#E56FA3;
+  --building:#2E3948; --win-off:#222B36; --win-on:#F5C858; --shop-on:#F49A62;
+  --good:#4CC183; --warn:#E3AE3C; --bad:#EE6A5C; --sky:#1A2533; --brick:#5E3324; --home:#2E4A3C; --home-on:#FFDD95;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink)}
+body{margin:0;font-family:var(--f-body);font-size:14px;line-height:1.6;padding-inline:16px;padding-block:12px 32px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--rule)}
+.row1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-weight:400;font-size:20px;margin:0;letter-spacing:.04em;margin-right:auto}
+.date{font-family:var(--f-display);font-size:16px;font-variant-numeric:tabular-nums}
+.btn{border:1px solid var(--rule);background:var(--panel);border-radius:6px;padding:6px 12px;min-height:36px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{display:flex;flex-direction:column;min-width:0}
+.stat .k{font-size:11px;color:var(--muted);letter-spacing:.06em}
+.stat .v{font-family:var(--f-display);font-size:18px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat .v.neg{color:var(--bad)}
+
+.tabs{display:flex;gap:0;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.tabs button{flex:1;border:0;background:var(--panel);padding:8px;min-height:40px;font-weight:500}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.panes{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:880px){.tabs{display:none}.panes{grid-template-columns:minmax(0,5fr) minmax(0,6fr)}.pane[hidden]{display:flex!important}}
+.pane{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h2{font-size:13px;margin:0;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.role{font-family:var(--f-display);font-size:13px;color:var(--muted);letter-spacing:.1em}
+
+/* タワー */
+.stage{background:var(--sky);border-radius:8px;padding:16px 12px 0;display:flex;flex-direction:column;align-items:center;overflow:hidden}
+.tower{display:flex;flex-direction:column;width:min(100%,260px)}
+.roof{height:10px;margin:0 18px;background:var(--building);border-radius:3px 3px 0 0}
+.floor{display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:6px;background:var(--building);padding:3px 6px;border-top:1px solid var(--win-off)}
+.fl{font-family:var(--f-display);font-size:11px;color:#C9D3DE;font-variant-numeric:tabular-nums}
+.wins{display:grid;grid-template-columns:repeat(8,1fr);gap:3px}
+.w{height:12px;background:var(--win-off);border-radius:1px}
+.w.on{background:var(--win-on)}
+.floor.shop{background:var(--brick);box-shadow:inset 0 3px 0 var(--shop-on)}
+.shop .w{height:14px}
+.shop .w.on{background:var(--shop-on)}
+.shop .wins{grid-template-columns:repeat(4,1fr)}
+.fl em{font-style:normal;display:inline-block;margin-left:3px;font-family:var(--f-body);font-size:10px;font-weight:700;padding:0 3px;border-radius:2px;background:#C9D3DE;color:#1A222C;vertical-align:1px}
+.shop .fl em{background:var(--shop-on)}
+.floor.home{background:var(--home)}
+.home .w.on{background:var(--home-on)}
+.home .wins{grid-template-columns:repeat(6,1fr)}
+.home .fl em{background:var(--home-on)}
+.ms{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}
+.ms li{border:1px solid var(--rule);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.ms li.done{border-color:var(--good);background:color-mix(in srgb,var(--good) 8%,var(--panel))}
+.ms .mh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ms .mn{font-weight:700}
+.ms .st{font-family:var(--f-display);font-size:12px;color:var(--muted);white-space:nowrap}
+.ms li.done .st{color:var(--good)}
+.ms .cond,.ms .prog,.ms .rew{font-size:12px;margin:0}
+.ms .cond{color:var(--muted)}
+.ms .prog{font-variant-numeric:tabular-nums}
+.ms .rew::before{content:"解放 ";color:var(--accent);font-weight:700}
+.bar{height:4px;background:var(--tile);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.ms li.done .bar i{background:var(--good)}
+.btn.locked small{color:var(--muted)}
+.ms-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+a.btn{text-decoration:none;display:inline-flex;align-items:center}
+.foot{font-size:11px;color:var(--muted);margin:0;text-align:center}
+.floor{grid-template-columns:48px 1fr auto}
+.tlegend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted)}
+.tlegend b{display:inline-block;width:14px;height:10px;border-radius:2px;vertical-align:-1px;margin-right:4px}
+.mode{display:flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.mode button{flex:1;border:0;background:var(--panel);padding:7px 8px;min-height:38px;font-weight:500}
+.mode button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:2px solid var(--rule);background:var(--panel);border-radius:999px;padding:3px 12px;min-height:32px;display:inline-flex;align-items:center;gap:6px}
+.chip b{width:14px;height:5px;border-radius:3px;display:inline-block}
+.chip[aria-pressed="true"]{border-color:var(--ink);font-weight:700}
+.chip:disabled{opacity:.45;cursor:not-allowed}
+.shafts{display:flex;gap:2px}
+.shaft{width:7px;height:14px;background:#0E141B;border-radius:1px}
+.shaft.busy{background:var(--bad)}
+.lobby .wins{grid-template-columns:1fr 1fr 2fr 1fr 1fr}
+.lobby .w.door{background:var(--win-on)}
+.street{width:100%;margin-top:0;background:var(--muted);height:6px}
+.ground{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 2px 10px;font-size:12px;color:var(--ink)}
+.sign{display:inline-flex;align-items:center;gap:6px;font-weight:700}
+.sign i{width:16px;height:16px;border-radius:50%;border:3px solid var(--ink);background:var(--panel);display:inline-block}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px}
+.kv div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dotted var(--rule);padding-bottom:3px;min-width:0}
+.kv span:first-child{color:var(--muted);font-size:12px}
+.kv span:last-child{font-variant-numeric:tabular-nums;font-weight:500}
+.actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.actions .btn{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:8px 10px;line-height:1.35}
+.actions .btn small{color:var(--muted);font-size:11px}
+.actions .btn.primary small{color:inherit;opacity:.85}
+.actions .wide{grid-column:1/-1}
+.note{font-size:12px;color:var(--muted);margin:0}
+.pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.pill.pending{color:var(--warn)} .pill.building{color:var(--l1)} .pill.done{color:var(--good)} .pill.expired{color:var(--bad)}
+.warn{color:var(--warn)} .bad{color:var(--bad)} .good{color:var(--good)}
+
+/* 地図 */
+.map{width:100%;height:auto;display:block;touch-action:manipulation}
+.map .tile{fill:var(--tile);stroke:transparent;stroke-width:2;cursor:pointer}
+.map .tile.sel{stroke:var(--accent)}
+.map .tile.cand{stroke:var(--accent);stroke-dasharray:5 4}
+.map .tile.mine{fill:color-mix(in srgb,var(--accent) 14%,var(--tile))}
+.map .name{fill:var(--ink);font-size:13px;font-weight:700;pointer-events:none}
+.map .sub{fill:var(--muted);font-size:10px;pointer-events:none}
+.map .stn{fill:var(--panel);stroke:var(--ink);stroke-width:3;pointer-events:none}
+.map .dot{fill:var(--muted);pointer-events:none}
+.map .badge{fill:var(--accent);pointer-events:none}
+.map .badge-t{fill:var(--accent-ink);font-size:11px;font-weight:700;pointer-events:none}
+.map .seg{stroke-width:7;stroke-linecap:round;fill:none;pointer-events:none}
+.map .seg.l1{stroke:var(--l1)} .map .seg.l2{stroke:var(--l2)} .map .seg.l3{stroke:var(--l3)} .map .seg.l4{stroke:var(--l4)}
+.map .seg.plan{stroke:var(--accent);stroke-dasharray:2 9;stroke-width:6}
+.map .seg.wip{stroke-dasharray:8 6;opacity:.75}
+.map .bldg{fill:var(--ink);pointer-events:none}
+.plan-box{display:flex;flex-direction:column;gap:8px}
+.route{font-weight:700;overflow-wrap:anywhere}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.legend b{display:inline-block;width:18px;height:5px;border-radius:3px;vertical-align:middle;margin-right:4px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.inbox{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.inbox li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 0;border-bottom:1px solid var(--rule)}
+.inbox li:last-child{border-bottom:0}
+.inbox .who{font-weight:700;min-width:0}
+.inbox .what{grid-column:1/-1;font-size:12px;color:var(--muted)}
+.inbox li.own .who::before{content:"自社 ";color:var(--accent)}
+.log{list-style:none;margin:0;padding:0;font-size:12.5px;display:flex;flex-direction:column;gap:4px}
+.log li{display:grid;grid-template-columns:auto 1fr;gap:8px}
+.log time{color:var(--muted);font-variant-numeric:tabular-nums;font-family:var(--f-display)}
+.log li.good span{color:var(--good)} .log li.bad span{color:var(--bad)} .log li.own span{color:var(--accent)}
+.msg{min-height:1.4em;font-size:12px;color:var(--bad);margin:0}
+@media (prefers-reduced-motion:no-preference){.w{transition:background .4s}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="row1">
+      <h1>摩天楼と地下鉄</h1>
+      <span class="date" id="date"></span>
+      <button class="btn" id="step">1か月進める</button>
+      <button class="btn primary" id="play">▶ 再生</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="k">ビルの資金</span><span class="v" id="sCash"></span></div>
+      <div class="stat"><span class="k">市の予算</span><span class="v" id="sBudget"></span></div>
+      <div class="stat"><span class="k">市長支持率</span><span class="v" id="sAppr"></span></div>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tabOwner" aria-selected="true">ビル経営</button>
+    <button role="tab" id="tabMayor" aria-selected="false">市長</button>
+  </div>
+
+  <div class="panes">
+    <section class="pane" id="paneOwner">
+      <div class="card">
+        <span class="role">OWNER ／ 桜台タワー</span>
+        <div class="stage">
+          <div class="tower" id="tower"></div>
+          <div class="street"></div>
+          <div class="ground" id="ground"></div>
+        </div>
+        <div class="tlegend" id="tlegend"></div>
+        <div class="kv" id="ownerKv"></div>
+      </div>
+      <div class="card">
+        <h2>経営判断</h2>
+        <div class="actions">
+          <button class="btn" id="addOffice"></button>
+          <button class="btn" id="addShop"></button>
+          <button class="btn" id="addHome"></button>
+          <button class="btn" id="addElev"></button>
+          <button class="btn primary wide" id="lobby"></button>
+        </div>
+        <p class="note" id="ownReq"></p>
+        <p class="msg" id="ownerMsg"></p>
+      </div>
+    </section>
+
+    <section class="pane" id="paneMayor" hidden>
+      <div class="card">
+        <span class="role">MAYOR ／ 地下鉄整備計画</span>
+        <div class="mode" role="group" aria-label="計画の種類">
+          <button id="modeNew" aria-pressed="true">新線を引く</button>
+          <button id="modeExt" aria-pressed="false">既存線を延伸</button>
+        </div>
+        <div class="chips" id="lineChips" hidden></div>
+        <svg class="map" id="map" viewBox="0 0 400 300" role="img" aria-label="市内12地区と地下鉄路線図"></svg>
+        <div class="legend" id="legend"></div>
+        <div class="plan-box" id="planBox"></div>
+        <p class="msg" id="planMsg"></p>
+      </div>
+      <div class="card">
+        <h2>市に届いている要望</h2>
+        <ul class="inbox" id="inbox"></ul>
+      </div>
+    </section>
+  </div>
+
+  <div class="card">
+    <div class="ms-head"><h2>マイルストン</h2><a class="btn" id="share" target="_blank" rel="noopener">Xで共有</a></div>
+    <ul class="ms" id="ms"></ul>
+  </div>
+
+  <div class="card">
+    <h2>出来事</h2>
+    <ul class="log" id="log"></ul>
+  </div>
+  <p class="foot">このページは遊んだ人数を知るため Google Analytics でアクセスと進み具合を記録しています。個人を特定する情報は送っていません。</p>
+</div>
+
+<script>
+(function(){
+const COLS=4, ROWS=3;
+const NAMES=['北山','中央','東町','港北','西原','本町','旭','港南','緑丘','桜台','南浜','工場前'];
+const POP=[28,45,32,20,18,38,22,16,24,14,19,12];   // 千人
+const BIZ=[10,40,18,8,5,25,9,6,7,4,8,15];
+const ACCESS=[1,.7,.45,.3];
+const RENT={office:110,shop:80,home:70};
+const ORGS=['商店会','自治会','オフィス街協議会','PTA連合会','マンション管理組合'];
+const TOWER=9, LOBBY_COST=200, ELEV_COST=400;
+const maxFloors=()=>S.ms.sky?24:16, maxElev=()=>S.ms.full?6:4, costMul=()=>S.ms.loop?.85:1, incomeMul=()=>S.ms.trust?1.15:1;
+const KIND={office:'オフィス',shop:'店舗',home:'住宅',lobby:'ロビー'}, TAG={office:'事務',shop:'店舗',home:'住宅'};
+
+function fresh(){
+  return {
+    month:0, cash:6000, budget:9000, approval:55, elevators:1, nextId:1,
+    floors:[{type:'lobby',occ:1},{type:'office',occ:.4},{type:'office',occ:.35},{type:'shop',occ:.3}],
+    districts:NAMES.map((n,i)=>({name:n,pop:POP[i],pop0:POP[i],biz:BIZ[i],biz0:BIZ[i]})),
+    lines:[{id:1,name:'1号線',color:'l1',nodes:[0,1,2,3],loop:false,open:true,left:0,total:0,cost:0}],
+    works:[], mode:'new', extLine:null, planLoop:false,
+    requests:[
+      {id:'r0',from:'港南商店会',district:7,month:-5,status:'pending',own:false}
+    ],
+    plan:[], log:[], ms:{}, fullStreak:0, lastIncome:0, lastCost:0, lastCity:0
+  };
+}
+let S=fresh(), timer=null;
+
+const $=id=>document.getElementById(id);
+const rc=i=>[Math.floor(i/COLS),i%COLS];
+const man=(a,b)=>{const[r1,c1]=rc(a),[r2,c2]=rc(b);return Math.abs(r1-r2)+Math.abs(c1-c2)};
+const adj=(a,b)=>man(a,b)===1;
+const yen=v=>{const s=v<0?'−':'';v=Math.abs(Math.round(v));return v>=10000?`${s}${(v/10000).toFixed(2)}億円`:`${s}${v.toLocaleString()}万円`};
+const dateOf=m=>{const y=2026+Math.floor((3+m)/12),mo=(3+m)%12+1;return `${y}年${mo}月`};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+function edges(nodes,loop){const e=[];for(let j=1;j<nodes.length;j++)e.push([nodes[j-1],nodes[j]]);if(loop&&nodes.length>2)e.push([nodes[nodes.length-1],nodes[0]]);return e}
+function stations(withWip){
+  const s=new Set();
+  S.lines.forEach(l=>{if(l.open||withWip)l.nodes.forEach(n=>s.add(n))});
+  if(withWip)S.works.forEach(w=>w.nodes.forEach(n=>s.add(n)));
+  return s;
+}
+function nearest(i){let best=9,who=null;stations(false).forEach(n=>{const d=man(i,n);if(d<best){best=d;who=n}});return{d:best,who}}
+function wipFor(i){
+  if(stations(false).has(i)) return null;
+  return S.lines.find(l=>!l.open&&l.nodes.includes(i))||S.works.find(w=>w.nodes.includes(i))||null;
+}
+function lineById(id){return S.lines.find(l=>l.id===id)}
+function extendable(l){return l.open&&!l.loop&&!S.works.some(w=>w.lineId===l.id)}
+function upper(){return S.floors.filter(f=>f.type!=='lobby')}
+function congestion(){return Math.max(0,upper().length-S.elevators*6)*.06}
+function residents(){return S.floors.filter(f=>f.type==='home').reduce((a,f)=>a+f.occ,0)*2}
+function popOf(i){return S.districts[i].pop+(i===TOWER?residents():0)}
+function target(type,acc,pen,pop){
+  if(type==='home') return clamp(.3+.45*acc+(S.floors.some(f=>f.type==='shop')?.12:0)-pen*.5,.05,.98);
+  return type==='office'
+    ? clamp(.25+.65*acc-pen,.05,.98)
+    : clamp(.1+.6*acc+.3*Math.min(1,pop/40)-pen,.05,.98);
+}
+function log(text,kind){S.log.unshift({m:S.month,text,kind:kind||''});S.log=S.log.slice(0,30)}
+
+function ridership(nodes){
+  const st=stations(true);let r=0;
+  nodes.forEach(n=>{
+    const d=S.districts[n];let v=popOf(n)*.6+d.biz*.8;
+    if(n===TOWER) v+=upper().reduce((a,f)=>a+f.occ,0)*3;
+    r+= st.has(n)? v*.5+8 : v;
+  });
+  return r; // 千人/日
+}
+function planCost(nodes,loop){
+  const st=stations(true);
+  const seg=Math.max(0,nodes.length-1)+(loop?1:0), neu=nodes.filter(n=>!st.has(n)).length;
+  return {seg,neu,cost:Math.round((seg*2500+neu*1500)*costMul()),months:seg*3};
+}
+
+function openWork(w){
+  const l=lineById(w.lineId);
+  const mid=w.loop?w.nodes.slice(1,-1):w.nodes.slice(1);
+  if(w.fromStart) l.nodes=[...mid.slice().reverse(),...l.nodes];
+  else l.nodes=[...l.nodes,...mid];
+  if(w.loop) l.loop=true;
+  const r=ridership(w.nodes);
+  const label=w.loop?`${l.name}の延伸区間が完成し、環状線になりました`:`${l.name}の延伸区間（${w.nodes.map(n=>NAMES[n]).join('–')}）が開業`;
+  settle({name:l.name,nodes:mid,cost:w.cost},r,label);
+}
+function openLine(l){
+  l.open=true;
+  const r=ridership(l.nodes);
+  settle(l,r,`${l.name}（${l.nodes.map(n=>NAMES[n]).join('–')}${l.loop?'・環状':''}）が開業`);
+}
+function settle(l,r,label){
+  const eff=r/l.cost*1000;
+  log(`${label}。1日 ${(r/10).toFixed(1)}万人の利用見込み`,'good');
+  let delta=0;
+  S.requests.forEach(q=>{
+    if(q.status==='pending'&&l.nodes.includes(q.district)){
+      q.status='done';delta+=4;
+      log(q.own?`自社の要望が実現。${NAMES[q.district]}駅が開業しました`:`${q.from}の要望が実現（支持率 +4）`,q.own?'own':'good');
+    }
+  });
+  if(eff>=9){delta+=3;log(`${l.name}は利用好調と報道（支持率 +3）`,'good')}
+  else if(eff<5){delta-=4;log(`${l.name}は費用に見合わないと批判（支持率 −4）`,'bad')}
+  S.approval=clamp(S.approval+delta,0,100);
+}
+
+function maybeRival(){
+  const pend=S.requests.filter(q=>q.status==='pending'&&!q.own).length;
+  if(pend>=3||Math.random()>.16) return;
+  const st=stations(true);
+  const cand=S.districts.map((d,i)=>i).filter(i=>i!==TOWER&&!st.has(i)&&!S.requests.some(q=>q.status==='pending'&&q.district===i));
+  if(!cand.length) return;
+  const tot=cand.reduce((a,i)=>a+S.districts[i].pop,0);let x=Math.random()*tot,pick=cand[0];
+  for(const i of cand){x-=S.districts[i].pop;if(x<=0){pick=i;break}}
+  const from=NAMES[pick]+ORGS[Math.floor(Math.random()*ORGS.length)];
+  S.requests.push({id:'r'+(S.nextId++),from,district:pick,month:S.month,status:'pending',own:false});
+  log(`${from}から${NAMES[pick]}への地下鉄延伸の要望が届きました`);
+}
+
+function tick(){
+  S.month++;
+  const st=stations(false);
+  S.districts.forEach((d,i)=>{if(st.has(i)){d.pop=Math.min(d.pop*1.006,d.pop0*1.8);d.biz=Math.min(d.biz*1.008,d.biz0*2)}});
+  const acc=ACCESS[Math.min(nearest(TOWER).d,3)], pen=congestion(), pop=popOf(TOWER);
+  let inc=0;
+  upper().forEach(f=>{f.occ+=(target(f.type,acc,pen,pop)-f.occ)*.25;inc+=f.occ*RENT[f.type]});
+  const cost=S.floors.length*12+S.elevators*20;
+  S.lastIncome=Math.round(inc);S.lastCost=cost;S.cash+=Math.round(inc-cost);
+  const base=S.districts.reduce((a,d,i)=>a+popOf(i)*.9+d.biz*1.2,0)+upper().reduce((a,f)=>a+f.occ*5,0);
+  S.lastCity=Math.round(base*(.7+.6*S.approval/100)*incomeMul());S.budget+=S.lastCity;
+  S.lines.forEach(l=>{if(!l.open){l.left--;if(l.left<=0)openLine(l)}});
+  S.works.forEach(w=>{w.left--;if(w.left<=0)openWork(w)});
+  S.works=S.works.filter(w=>w.left>0);
+  let stale=0;
+  S.requests.forEach(q=>{
+    if(q.status!=='pending')return;
+    const age=S.month-q.month;
+    if(age>=24&&!wipFor(q.district)){q.status='expired';S.approval-=3;log(`${q.from}の要望が棚上げのまま失効（支持率 −3）`,'bad')}
+    else if(age>=12&&!wipFor(q.district)) stale++;
+  });
+  S.approval=clamp(S.approval+(50-S.approval)*.015-stale*.3,0,100);
+  maybeRival();
+  checkMilestones();
+  if(S.month%12===0) track('year_passed',{year:dateOf(S.month).slice(0,4)});
+  if(S.cash<0&&S.cash+S.lastCost-S.lastIncome>=0) log('ビルの資金が赤字に転落しました','bad');
+  render();
+}
+
+/* ---------- マイルストン ---------- */
+function avgOcc(){const u=upper();return u.length?u.reduce((a,f)=>a+f.occ,0)/u.length:0}
+function staleCount(){return S.requests.filter(q=>q.status==='pending'&&S.month-q.month>=12&&!wipFor(q.district)).length}
+function coverage(){let k=0;S.districts.forEach((d,i)=>{if(nearest(i).d<=1)k++});return k}
+const MS=[
+  {id:'station',name:'駅前ビル',cond:'桜台に駅が開業する',reward:'住宅階が建てられる',
+   prog:()=>{const w=wipFor(TOWER);return [w?`桜台駅 工事中・あと${w.left}か月`:nearest(TOWER).d===0?'開業済み':'桜台駅 未計画',w?.5:0]},
+   test:()=>nearest(TOWER).d===0,
+   onDone:()=>log('住宅階が建てられるようになりました','own')},
+  {id:'full',name:'満室',cond:'平均入居率80%以上を3か月続ける',reward:'エレベーター上限 4基→6基',
+   prog:()=>[`入居率${Math.round(avgOcc()*100)}%・連続${S.fullStreak}/3か月`,Math.min(1,S.fullStreak/3)],
+   test:()=>S.fullStreak>=3},
+  {id:'trust',name:'信任',cond:'支持率60%以上で、12か月以上放置した要望がない',reward:'市の月収入 +15%',
+   prog:()=>[`支持率${Math.round(S.approval)}%・放置要望${staleCount()}件`,Math.min(1,S.approval/60)*(staleCount()?.5:1)],
+   test:()=>S.approval>=60&&staleCount()===0},
+  {id:'loop',name:'環状線',cond:'環状線を1本開業させる',reward:'以後の建設費 −15%',
+   prog:()=>{const w=S.works.find(x=>x.loop)||S.lines.find(l=>l.loop&&!l.open);return [w?`環状化工事中・あと${w.left}か月`:'環状線なし',w?.5:0]},
+   test:()=>S.lines.some(l=>l.loop&&l.open)},
+  {id:'sky',name:'摩天楼',cond:'ビルが16階以上、かつ12地区中10地区が駅から1区画以内',reward:'ビルの上限 17階→25階',
+   prog:()=>[`${S.floors.length}/16階・駅1区画以内${coverage()}/10地区`,(Math.min(1,S.floors.length/16)+Math.min(1,coverage()/10))/2],
+   test:()=>S.floors.length>=16&&coverage()>=10}
+];
+function checkMilestones(){
+  S.fullStreak=avgOcc()>=.8?S.fullStreak+1:0;
+  MS.forEach(m=>{
+    if(S.ms[m.id]===undefined&&m.test()){
+      S.ms[m.id]=S.month;
+      log(`マイルストン「${m.name}」達成。${m.reward}`,'good');
+      track('milestone',{milestone_id:m.id,game_date:dateOf(S.month)});
+      m.onDone&&m.onDone();
+    }
+  });
+}
+function shareUrl(){
+  const done=MS.filter(m=>S.ms[m.id]!==undefined);
+  const last=done.sort((a,b)=>S.ms[b.id]-S.ms[a.id])[0];
+  const text=last
+    ?`「摩天楼と地下鉄」で${dateOf(S.ms[last.id])}にマイルストン「${last.name}」を達成。${done.length}/${MS.length}達成、ビルは${S.floors.length}階、地下鉄${S.lines.length}路線`
+    :`「摩天楼と地下鉄」でビル経営と地下鉄計画を遊んでいます。いまは${dateOf(S.month)}、ビルは${S.floors.length}階`;
+  const p=new URLSearchParams({text,url:location.href.split('#')[0],hashtags:'摩天楼と地下鉄'});
+  return 'https://x.com/intent/tweet?'+p.toString();
+}
+function renderMs(){
+  $('share').href=shareUrl();
+  $('ms').innerHTML=MS.map(m=>{
+    const done=S.ms[m.id]!==undefined;
+    const [p,r]=done?['',1]:m.prog();
+    return `<li class="${done?'done':''}"><div class="mh"><span class="mn">${m.name}</span><span class="st">${done?dateOf(S.ms[m.id])+' 達成':'未達成'}</span></div>
+      <p class="cond">${m.cond}</p>${done?'':`<p class="prog">${p}</p>`}<div class="bar"><i style="width:${Math.round(r*100)}%"></i></div><p class="rew">${m.reward}</p></li>`;
+  }).join('');
+}
+
+/* ---------- ビル経営 ---------- */
+function floorCost(){return 600+40*S.floors.length}
+function addFloor(type){
+  if(type==='home'&&!S.ms.station) return ownerMsg('住宅階は「駅前ビル」達成で解放されます');
+  if(S.floors.length>=maxFloors()+1) return ownerMsg(`今は${maxFloors()+1}階までです${S.ms.sky?'':'（「摩天楼」で上限が上がります）'}`);
+  const c=floorCost();if(S.cash<c) return ownerMsg('資金が足りません');
+  S.cash-=c;S.floors.push({type,occ:.05});
+  log(`${S.floors.length}階に${KIND[type]}を増築（${yen(c)}）`);
+  if(congestion()>0&&congestion()<=.06) log('エレベーターが混み始めました。入居率に響きます','bad');
+  render();
+}
+function addElev(){
+  if(S.elevators>=maxElev()) return ownerMsg(`今は${maxElev()}基までです${S.ms.full?'':'（「満室」で上限が上がります）'}`);
+  if(S.cash<ELEV_COST) return ownerMsg('資金が足りません');
+  S.cash-=ELEV_COST;S.elevators++;log(`エレベーターを${S.elevators}基に増設`);render();
+}
+function lobbyRequest(){
+  if(stations(true).has(TOWER)) return ownerMsg('桜台にはすでに駅があるか工事中です');
+  if(S.requests.some(q=>q.own&&q.status==='pending')) return ownerMsg('要望はすでに市に届いています');
+  if(S.cash<LOBBY_COST) return ownerMsg('資金が足りません');
+  S.cash-=LOBBY_COST;
+  S.requests.push({id:'r'+(S.nextId++),from:'桜台タワー',district:TOWER,month:S.month,status:'pending',own:true});
+  log('桜台タワーから市へ、桜台への地下鉄誘致を要望しました','own');render();
+}
+let ownerMsgT=null;
+function ownerMsg(t){$('ownerMsg').textContent=t;clearTimeout(ownerMsgT);ownerMsgT=setTimeout(()=>$('ownerMsg').textContent='',2600)}
+
+function hash(a,b){let h=(a*374761393+b*668265263)>>>0;h=(h^(h>>>13))*1274126177>>>0;return (h&1023)/1024}
+function renderTower(){
+  const busy=congestion()>0;
+  let html='<div class="roof"></div>';
+  for(let i=S.floors.length-1;i>=0;i--){
+    const f=S.floors[i];
+    const sh=Array.from({length:S.elevators},()=>`<span class="shaft${busy?' busy':''}"></span>`).join('');
+    let wins='';
+    if(f.type==='lobby') wins='<span class="w"></span><span class="w"></span><span class="w door"></span><span class="w"></span><span class="w"></span>';
+    else{const n=f.type==='shop'?4:f.type==='home'?6:8;for(let k=0;k<n;k++)wins+=`<span class="w${hash(i,k)<f.occ?' on':''}"></span>`}
+    const tag=TAG[f.type]?`<em>${TAG[f.type]}</em>`:'';
+    html+=`<div class="floor ${f.type}" title="${KIND[f.type]} 入居${Math.round(f.occ*100)}%"><span class="fl">${i+1}F${tag}</span><div class="wins">${wins}</div><div class="shafts">${sh}</div></div>`;
+  }
+  $('tower').innerHTML=html;
+  const n=nearest(TOWER), wip=wipFor(TOWER);
+  let left, right;
+  if(n.d===0){left=`<span class="sign"><i></i>桜台駅 直結</span>`}
+  else left=`<span>最寄り駅は${NAMES[n.who]}（${n.d}区画先）</span>`;
+  right=wip?`<span class="warn">桜台駅 工事中・あと${wip.left}か月</span>`:'';
+  $('ground').innerHTML=left+right;
+  const byType=t=>{const fs=upper().filter(f=>f.type===t);return fs.length?`${fs.length}フロア・入居${Math.round(fs.reduce((a,f)=>a+f.occ,0)/fs.length*100)}%`:'なし'};
+  $('tlegend').innerHTML=`<span><b style="background:var(--building);box-shadow:inset 0 0 0 3px var(--win-on)"></b>オフィス（${byType('office')}）</span><span><b style="background:var(--brick);box-shadow:inset 0 2px 0 var(--shop-on)"></b>店舗（${byType('shop')}）</span>${S.ms.station?`<span><b style="background:var(--home);box-shadow:inset 0 0 0 3px var(--home-on)"></b>住宅（${byType('home')}）</span>`:''}<span>灯りのついた窓が入居中の区画です</span>`;
+  const occ=upper().length?upper().reduce((a,f)=>a+f.occ,0)/upper().length:0;
+  const net=S.lastIncome-S.lastCost;
+  $('ownerKv').innerHTML=[
+    ['階数',`${S.floors.length}階`],
+    ['平均入居率',`${Math.round(occ*100)}%`],
+    ['月の賃料収入',yen(S.lastIncome)],
+    ['月の維持費',yen(S.lastCost)],
+    ['月の収支',`<span class="${net<0?'bad':''}">${yen(net)}</span>`],
+    ['エレベーター',`${S.elevators}基 ${busy?'<span class="bad">混雑</span>':'余裕あり'}`]
+  ].map(([k,v])=>`<div><span>${k}</span><span>${v}</span></div>`).join('');
+  const fc=floorCost();
+  $('addOffice').innerHTML=`オフィス階を増築<small>${yen(fc)}・駅が近いほど埋まる</small>`;
+  $('addShop').innerHTML=`店舗階を増築<small>${yen(fc)}・人口と駅に左右される</small>`;
+  $('addHome').innerHTML=S.ms.station?`住宅階を増築<small>${yen(fc)}・桜台の人口が増える</small>`:`住宅階（未解放）<small>「駅前ビル」達成で解放</small>`;
+  $('addHome').classList.toggle('locked',!S.ms.station);
+  $('addElev').innerHTML=`エレベーター増設<small>${yen(ELEV_COST)}・1基で6フロア（${S.elevators}/${maxElev()}基）</small>`;
+  $('lobby').innerHTML=`地下鉄誘致を市に要望<small>陳情費 ${yen(LOBBY_COST)}</small>`;
+  const own=S.requests.filter(q=>q.own).slice(-1)[0];
+  let t='桜台には駅がなく、オフィスの入居が伸び悩んでいます。市長の画面で要望がどう扱われるかを見てみてください。';
+  if(own){
+    const age=S.month-own.month;
+    if(own.status==='pending') t=wipFor(TOWER)?`要望は受理され、桜台駅は工事中です。`:`要望を提出して${age}か月。市はまだ計画に入れていません（24か月で失効）。`;
+    else if(own.status==='done') t='要望が実現し、桜台駅が開業しました。入居率は数か月かけて上がります。';
+    else if(own.status==='expired') t='要望は失効しました。もう一度陳情できます。';
+  }
+  if(nearest(TOWER).d===0) t='駅直結になりました。増築して需要を取り込む段階です。';
+  $('ownReq').textContent=t;
+}
+
+/* ---------- 市長 ---------- */
+function segKey(a,b){return a<b?a+'-'+b:b+'-'+a}
+function renderMap(){
+  const pend=new Set(S.requests.filter(q=>q.status==='pending').map(q=>q.district));
+  const stOpen=stations(false);
+  const cands=new Set();
+  const el=S.mode==='ext'&&S.extLine?lineById(S.extLine):null;
+  if(el&&!S.plan.length){cands.add(el.nodes[0]);cands.add(el.nodes[el.nodes.length-1])}
+  let g='';
+  S.districts.forEach((d,i)=>{
+    const[r,c]=rc(i),x=c*100+5,y=r*100+5;
+    const sel=S.plan.includes(i);
+    g+=`<rect class="tile${sel?' sel':''}${cands.has(i)?' cand':''}${i===TOWER?' mine':''}" data-i="${i}" x="${x}" y="${y}" width="90" height="90" rx="10" tabindex="0" role="button" aria-label="${d.name}"></rect>`;
+    g+=`<text class="name" x="${x+45}" y="${y+21}" text-anchor="middle">${d.name}</text>`;
+    g+=`<text class="sub" x="${x+45}" y="${y+83}" text-anchor="middle">人口${(popOf(i)/10).toFixed(1)}万</text>`;
+    if(i===TOWER) g+=`<rect class="bldg" x="${x+74}" y="${y+6}" width="9" height="20" rx="1"></rect>`;
+    if(pend.has(i)) g+=`<circle class="badge" cx="${x+12}" cy="${y+13}" r="8"></circle><text class="badge-t" x="${x+12}" y="${y+17}" text-anchor="middle">!</text>`;
+  });
+  // 区間ごとに通る路線を数えて平行にずらす
+  const all=S.lines.map(l=>({e:edges(l.nodes,l.loop),cls:l.color+(l.open?'':' wip')}));
+  S.works.forEach(w=>{const l=lineById(w.lineId);all.push({e:edges(w.nodes,false),cls:l.color+' wip'})});
+  if(S.plan.length>1) all.push({e:edges(S.plan,false).concat(S.planLoop&&S.mode==='new'?[[S.plan[S.plan.length-1],S.plan[0]]]:[]),cls:'plan'});
+  const segs={};
+  all.forEach((l,k)=>l.e.forEach(([a,b])=>{const key=segKey(a,b);(segs[key]=segs[key]||[]).push(k)}));
+  all.forEach((l,k)=>{
+    for(const[a,b] of l.e){
+      const list=segs[segKey(a,b)],off=(list.indexOf(k)-(list.length-1)/2)*8;
+      const[r1,c1]=rc(a),[r2,c2]=rc(b);
+      let x1=c1*100+50,y1=r1*100+50,x2=c2*100+50,y2=r2*100+50;
+      if(r1===r2){y1+=off;y2+=off}else{x1+=off;x2+=off}
+      g+=`<line class="seg ${l.cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"></line>`;
+    }
+  });
+  const stAll=stations(true);
+  S.districts.forEach((d,i)=>{
+    const[r,c]=rc(i),cx=c*100+50,cy=r*100+50;
+    if(stOpen.has(i)) g+=`<circle class="stn" cx="${cx}" cy="${cy}" r="9"></circle>`;
+    else if(stAll.has(i)) g+=`<circle class="stn" cx="${cx}" cy="${cy}" r="9" style="stroke-dasharray:3 3"></circle>`;
+    else g+=`<circle class="dot" cx="${cx}" cy="${cy}" r="3"></circle>`;
+  });
+  $('map').innerHTML=g;
+  $('legend').innerHTML=S.lines.map(l=>{
+      const w=S.works.find(x=>x.lineId===l.id);
+      const st=!l.open?`（工事中・あと${l.left}か月）`:w?`（延伸工事中・あと${w.left}か月）`:l.loop?'（環状）':'';
+      return `<span><b style="background:var(--${l.color})"></b>${l.name}${st}</span>`;
+    }).join('')
+    +`<span><b style="background:var(--accent)"></b>計画中</span><span>! 要望あり</span>`;
+}
+function chipsHtml(){
+  return S.lines.map(l=>{
+    const ok=extendable(l);
+    const why=!l.open?'工事中':l.loop?'環状':S.works.some(w=>w.lineId===l.id)?'延伸中':'';
+    return `<button class="chip" data-line="${l.id}" aria-pressed="${S.extLine===l.id}" ${ok?'':'disabled'}><b style="background:var(--${l.color})"></b>${l.name}${why?`（${why}）`:''}</button>`;
+  }).join('');
+}
+function renderPlan(){
+  $('modeNew').setAttribute('aria-pressed',S.mode==='new');
+  $('modeExt').setAttribute('aria-pressed',S.mode==='ext');
+  $('lineChips').hidden=S.mode!=='ext';
+  if(S.mode==='ext') $('lineChips').innerHTML=chipsHtml();
+  const p=S.plan, ext=S.mode==='ext', el=ext&&S.extLine?lineById(S.extLine):null;
+  if(!p.length){
+    let t;
+    if(!ext) t='地区をタップして新しい路線を引きます。続けて隣の地区をタップすると延び、既存の駅を通れば乗換駅になります。最初の地区に戻ると環状線になります。最後の地区をもう一度タップすると1つ戻ります。';
+    else if(!el) t='延伸する路線を選んでください。';
+    else t=`${el.name}の端の駅（点線で囲んだ地区）をタップし、そこから隣の地区へ延ばします。反対側の端に戻ってくると環状線になります。`;
+    $('planBox').innerHTML=`<p class="note">${t}</p>`;
+    return;
+  }
+  const loopNew=!ext&&S.planLoop;
+  const {seg,neu,cost,months}=planCost(p,loopNew);
+  const r=ridership(ext?p.slice(1):p), eff=seg?r/cost*1000:0;
+  const hits=S.requests.filter(q=>q.status==='pending'&&p.includes(q.district));
+  const verdict=!seg?'':eff>=9?'<span class="good">採算良好の見込み</span>':eff<5?'<span class="bad">費用に見合わないと批判されそう</span>':'<span class="warn">評価は分かれそう</span>';
+  const ok=seg>0&&S.budget>=cost;
+  const head=ext?`${el.name} 延伸：`:'新線：';
+  const route=p.map(n=>NAMES[n]).join(' → ')+(loopNew?` → ${NAMES[p[0]]}`:'')+(S.planLoop?'（環状）':'');
+  $('planBox').innerHTML=`
+    <div class="route">${head}${route}</div>
+    <div class="kv">
+      <div><span>区間・新駅</span><span>${seg}区間・${neu}駅</span></div>
+      <div><span>建設費</span><span class="${S.budget<cost?'bad':''}">${yen(cost)}</span></div>
+      <div><span>工期</span><span>${months}か月</span></div>
+      <div><span>${ext?'延伸区間の利用':'利用見込み'}</span><span>${(r/10).toFixed(1)}万人/日</span></div>
+    </div>
+    <p class="note">${verdict}${hits.length?`　応える要望：${hits.map(q=>q.from).join('、')}`:'　応える要望はありません'}</p>
+    <div class="btnrow">
+      <button class="btn primary" id="build" ${ok?'':'disabled'}>この計画で着工</button>
+      <button class="btn" id="clearPlan">計画を消す</button>
+    </div>`;
+  $('build').onclick=build;$('clearPlan').onclick=()=>{S.plan=[];S.planLoop=false;render()};
+}
+let planMsgT=null;
+function planMsg(t){$('planMsg').textContent=t;clearTimeout(planMsgT);planMsgT=setTimeout(()=>$('planMsg').textContent='',2600)}
+function tapDistrict(i){
+  const p=S.plan,last=p[p.length-1];
+  if(S.planLoop){
+    if(i===last||(S.mode==='new'&&i===p[0])){S.planLoop=false;if(S.mode==='ext')p.pop();return render()}
+    return planMsg('環状になっています。最後の地区をタップすると環状を解除します');
+  }
+  if(S.mode==='ext'){
+    const l=S.extLine?lineById(S.extLine):null;
+    if(!l) return planMsg('先に延伸する路線を選んでください');
+    const a=l.nodes[0],b=l.nodes[l.nodes.length-1];
+    if(!p.length){
+      if(i!==a&&i!==b) return planMsg(`${l.name}の端（${NAMES[a]}か${NAMES[b]}）から始めてください`);
+      p.push(i);return render();
+    }
+    if(i===last){p.pop();return render()}
+    const other=p[0]===a?b:a;
+    if(i===other&&adj(last,i)&&p.length>=2){p.push(i);S.planLoop=true;return render()}
+    if(l.nodes.includes(i)||p.includes(i)) return planMsg('同じ路線の駅を2回通ることはできません');
+    if(!adj(last,i)) return planMsg(`${NAMES[last]}の隣の地区を選んでください`);
+    p.push(i);return render();
+  }
+  if(!p.length) p.push(i);
+  else if(i===last) p.pop();
+  else if(i===p[0]&&p.length>=3&&adj(last,i)) S.planLoop=true;
+  else if(p.includes(i)) return planMsg('同じ地区を2回通ることはできません');
+  else if(adj(last,i)) p.push(i);
+  else if(p.length===1) p[0]=i;
+  else return planMsg(`${NAMES[last]}の隣の地区を選んでください`);
+  render();
+}
+function build(){
+  const p=S.plan, ext=S.mode==='ext', loopNew=!ext&&S.planLoop;
+  const {cost,months}=planCost(p,loopNew);
+  if(p.length<2||S.budget<cost) return;
+  const hits=S.requests.filter(q=>q.status==='pending'&&p.includes(q.district));
+  S.budget-=cost;
+  if(hits.length) S.approval=clamp(S.approval+hits.length,0,100);
+  const tail=`${yen(cost)}、工期${months}か月${hits.length?`（要望${hits.length}件に対応、支持率 +${hits.length}）`:''}`;
+  if(ext){
+    const l=lineById(S.extLine);
+    S.works.push({lineId:l.id,nodes:[...p],fromStart:p[0]===l.nodes[0]&&l.nodes.length>1?true:false,loop:S.planLoop,left:months,total:months,cost});
+    log(`${l.name}の延伸（${p.map(i=>NAMES[i]).join('–')}${S.planLoop?'・環状化':''}）を着工。${tail}`);
+    S.extLine=null;
+  }else{
+    const n=S.lines.length+1;
+    S.lines.push({id:n,name:`${n}号線`,color:'l'+((n-1)%4+1),nodes:[...p],loop:loopNew,open:false,left:months,total:months,cost});
+    log(`${n}号線（${p.map(i=>NAMES[i]).join('–')}${loopNew?'・環状':''}）を着工。${tail}`);
+  }
+  S.plan=[];S.planLoop=false;render();
+}
+function renderInbox(){
+  const list=[...S.requests].sort((a,b)=>(a.status==='pending'?0:1)-(b.status==='pending'?0:1)||b.month-a.month).slice(0,8);
+  const lbl={pending:'未対応',done:'実現',expired:'失効'};
+  $('inbox').innerHTML=list.length?list.map(q=>{
+    const w=q.status==='pending'&&wipFor(q.district);
+    const cls=w?'building':q.status, txt=w?'工事中':lbl[q.status];
+    return `<li class="${q.own?'own':''}"><span class="who">${q.from}</span><span class="pill ${cls}">${txt}</span><span class="what">${NAMES[q.district]}に駅を ・ ${dateOf(q.month)}受付${q.status==='pending'&&!w?`・${S.month-q.month}か月経過`:''}</span></li>`;
+  }).join(''):'<li><span class="what">要望はまだありません</span></li>';
+}
+
+function render(){
+  $('date').textContent=dateOf(S.month);
+  $('sCash').textContent=yen(S.cash);$('sCash').classList.toggle('neg',S.cash<0);
+  $('sBudget').textContent=yen(S.budget);
+  $('sAppr').textContent=Math.round(S.approval)+'%';
+  renderTower();renderMap();renderPlan();renderInbox();renderMs();
+  $('log').innerHTML=S.log.slice(0,8).map(e=>`<li class="${e.kind}"><time>${dateOf(e.m)}</time><span>${e.text}</span></li>`).join('');
+}
+
+/* ---------- 入力 ---------- */
+let started=false;
+function startOnce(){if(!started){started=true;track('game_start')}}
+$('share').addEventListener('click',()=>track('share',{method:'x'}));
+$('step').onclick=()=>{startOnce();tick()};
+$('play').onclick=()=>{
+  startOnce();
+  if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ 再生'}
+  else{timer=setInterval(tick,1500);$('play').textContent='❚❚ 停止'}
+};
+$('addOffice').onclick=()=>addFloor('office');
+$('addShop').onclick=()=>addFloor('shop');
+$('addHome').onclick=()=>addFloor('home');
+$('addElev').onclick=addElev;
+$('lobby').onclick=lobbyRequest;
+$('map').addEventListener('click',e=>{const t=e.target.closest('[data-i]');if(t)tapDistrict(+t.dataset.i)});
+$('map').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset.i){e.preventDefault();tapDistrict(+e.target.dataset.i)}});
+function tab(owner){
+  $('tabOwner').setAttribute('aria-selected',owner);$('tabMayor').setAttribute('aria-selected',!owner);
+  $('paneOwner').hidden=!owner;$('paneMayor').hidden=owner;
+}
+function setMode(m){S.mode=m;S.plan=[];S.planLoop=false;if(m==='new')S.extLine=null;render()}
+$('modeNew').onclick=()=>setMode('new');
+$('modeExt').onclick=()=>{setMode('ext');const c=S.lines.filter(extendable);if(c.length===1){S.extLine=c[0].id;render()}};
+$('lineChips').addEventListener('click',e=>{const b=e.target.closest('[data-line]');if(!b||b.disabled)return;S.extLine=+b.dataset.line;S.plan=[];S.planLoop=false;render()});
+$('tabOwner').onclick=()=>tab(true);$('tabMayor').onclick=()=>tab(false);
+
+function start(data){
+  if(data&&data.S){S=data.S;S.works=S.works||[];S.mode=S.mode||'new';S.planLoop=!!S.planLoop;S.ms=S.ms||{};S.fullStreak=S.fullStreak||0}
+  else{
+    log('桜台タワーの経営を引き継ぎました。駅から2区画離れていて、空室が目立ちます');
+    log('港南商店会から港南への地下鉄延伸の要望が届いています');
+  }
+  render();
+}
+window.claude?.hot?.snapshot?.(()=>({S}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+</body>
+</html>
